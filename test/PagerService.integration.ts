@@ -16,8 +16,13 @@ describe("PagerService", () => {
 
 	// First use case
 	test("Alert fired first time", () => {
-		const spy = jest.spyOn(ePAdapterMock, "getEscalationPolicy")
+		const spyMailAdapter = jest.spyOn(mailAdapterMock, "send")
+		const spySmsAdapter = jest.spyOn(smsAdapterMock, "send")
+		const spyTimerAdapter = jest.spyOn(timerAdapterMock, "setTimeout")
 		pagerService.fireAlert("service_1", "Test")
-		expect(spy).toBeCalledWith("service_1")
+
+		expect(spyMailAdapter).toBeCalled()
+		expect(spySmsAdapter).not.toBeCalled()
+		expect(spyTimerAdapter).toBeCalledWith("service_1", 15 * 60) // 15min
 	})
 })
