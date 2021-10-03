@@ -1,0 +1,26 @@
+{
+  "name": "technical-test-pager",
+  "version": "0.0.0",
+  "description": "Aircall technical test",
+  "main": "build/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "test": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Myushu/technical-test-pager.git"
+  },
+  "author": "Aljosha Armitano",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Myushu/technical-test-pager/issues"
+  },
+  "homepage": "https://github.com/Myushu/technical-test-pager#readme",
+  "devDependencies": {
+    "typescript": "^4.4.3"
+  }
+}
