@@ -1,4 +1,12 @@
-import { EPAdapter, TimerAdapter, MailAdapter, SMSAdapter, EscalationPolicy } from "./adapters"
+import {
+	EPAdapter,
+	TimerAdapter,
+	MailAdapter,
+	SMSAdapter,
+	EscalationPolicy,
+	PersistenceAdapter,
+	Incident
+} from "./adapters"
 import { ServiceId } from "./types"
 
 const timeout = 15 * 60 // 15min
@@ -7,6 +15,7 @@ export class PagerService {
 	constructor(
 		private epAdapter: EPAdapter,
 		private timeAdapter: TimerAdapter,
+		private persistenceAdapter: PersistenceAdapter,
 		private mailAdapter: MailAdapter,
 		private smsAdapter: SMSAdapter
 	) {}
@@ -15,6 +24,7 @@ export class PagerService {
 		const ep = this.epAdapter.getEscalationPolicy(serviceId)
 
 		this._notify(ep[0], message)
+		this.persistenceAdapter.createIncident(serviceId, { message, escalationLevel: 0 })
 		this.timeAdapter.setTimeout(serviceId, timeout)
 	}
 
@@ -36,5 +46,19 @@ export class PagerService {
 		}
 	}
 
-	public setTimeoutExpired(serviceId: ServiceId): void {}
+	public setTimeoutExpired(serviceId: ServiceId): void {
+		const incident: Incident = this.persistenceAdapter.getIncident(serviceId)
+		const ep = this.epAdapter.getEscalationPolicy(serviceId)
+
+		if (incident.acknowled) {
+			return // Incident has already ben acknowledged
+		}
+
+		if (incident.escalationLevel <= ep.length) {
+			incident.escalationLevel++
+			this._notify(ep[incident.escalationLevel], incident.message)
+			this.persistenceAdapter.updateIncident(serviceId, incident)
+			this.timeAdapter.setTimeout(serviceId, timeout)
+		}
+	}
 }
