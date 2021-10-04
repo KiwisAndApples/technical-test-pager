@@ -1,19 +1,34 @@
 import { Incident, PersistenceAdapter } from "../../src/adapters"
 import { ServiceId } from "../../src/types"
 
+type IncidentStore = {
+	[key: string]: Incident
+}
 export class PersistenceAdapterMock implements PersistenceAdapter {
+	private _store: IncidentStore = {}
+
 	public createIncident(serviceId: ServiceId, incident: { message: string; escalationLevel: number }): Boolean {
+		if (serviceId in this._store) {
+			return false
+		}
+
+		this._store[serviceId] = {
+			...incident,
+			acknowledged: false,
+			serviceId: serviceId
+		}
 		return true
 	}
 
-	public getIncident(serviceId: ServiceId): Incident {
-		return {
-			serviceId: "service_1",
-			message: "Test",
-			escalationLevel: 0,
-			acknowled: false
-		}
+	public getIncident(serviceId: ServiceId): Incident | undefined {
+		return this._store[serviceId] || undefined
 	}
 
-	public updateIncident(serviceId: ServiceId, incident: Incident): void {}
+	public updateIncidentAcknowledged(serviceId: ServiceId, acknowledged: boolean): void {
+		this._store[serviceId].acknowledged = acknowledged
+	}
+
+	public updateIncidentEscalationLevel(serviceId: ServiceId, escalationLevel: number): void {
+		this._store[serviceId].escalationLevel = escalationLevel
+	}
 }

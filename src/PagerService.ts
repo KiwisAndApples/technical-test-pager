@@ -28,6 +28,36 @@ export class PagerService {
 		this.timeAdapter.setTimeout(serviceId, timeout)
 	}
 
+	public setTimeoutExpired(serviceId: ServiceId): void {
+		const incident = this.persistenceAdapter.getIncident(serviceId)
+		const ep = this.epAdapter.getEscalationPolicy(serviceId)
+
+		if (!incident) {
+			return // Service is healthy
+		}
+
+		if (incident.acknowledged) {
+			return // Incident has already ben acknowledged
+		}
+
+		if (incident.escalationLevel <= ep.length) {
+			incident.escalationLevel++
+			this._notify(ep[incident.escalationLevel], incident.message)
+			this.persistenceAdapter.updateIncidentEscalationLevel(serviceId, incident.escalationLevel)
+			this.timeAdapter.setTimeout(serviceId, timeout)
+		}
+	}
+
+	public acknowledgeAlert(serviceId: ServiceId): void {
+		const incident = this.persistenceAdapter.getIncident(serviceId)
+
+		if (!incident) {
+			return // Service is healthy
+		}
+
+		this.persistenceAdapter.updateIncidentAcknowledged(serviceId, true)
+	}
+
 	/**
 	 * Notify all the targets of the given escalation policy
 	 */
@@ -43,22 +73,6 @@ export class PagerService {
 					break
 				}
 			}
-		}
-	}
-
-	public setTimeoutExpired(serviceId: ServiceId): void {
-		const incident: Incident = this.persistenceAdapter.getIncident(serviceId)
-		const ep = this.epAdapter.getEscalationPolicy(serviceId)
-
-		if (incident.acknowled) {
-			return // Incident has already ben acknowledged
-		}
-
-		if (incident.escalationLevel <= ep.length) {
-			incident.escalationLevel++
-			this._notify(ep[incident.escalationLevel], incident.message)
-			this.persistenceAdapter.updateIncident(serviceId, incident)
-			this.timeAdapter.setTimeout(serviceId, timeout)
 		}
 	}
 }
