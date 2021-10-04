@@ -21,8 +21,9 @@ describe("PagerService", () => {
 		const spyTimerAdapter = jest.spyOn(timerAdapterMock, "setTimeout")
 		pagerService.fireAlert("service_1", "Test")
 
-		expect(spyMailAdapter).toBeCalled()
+		expect(spyMailAdapter).toHaveBeenCalledTimes(1)
 		expect(spySmsAdapter).not.toBeCalled()
 		expect(spyTimerAdapter).toBeCalledWith("service_1", 15 * 60) // 15min
 	})
+	
 })

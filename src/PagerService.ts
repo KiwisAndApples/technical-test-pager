@@ -1,4 +1,4 @@
-import { EPAdapter, TimerAdapter, MailAdapter, SMSAdapter } from "./adapters"
+import { EPAdapter, TimerAdapter, MailAdapter, SMSAdapter, EscalationPolicy } from "./adapters"
 import { ServiceId } from "./types"
 
 const timeout = 15 * 60 // 15min
@@ -14,12 +14,27 @@ export class PagerService {
 	public fireAlert(serviceId: ServiceId, message: string): void {
 		const ep = this.epAdapter.getEscalationPolicy(serviceId)
 
-		if (ep[0].type === "SMS") {
-			this.smsAdapter.send(ep[0].phoneNumber, message)
-		} else if (ep[0].type === "EMAIL") {
-			this.mailAdapter.send(ep[0].emailAddress, message)
-		}
-
+		this._notify(ep[0], message)
 		this.timeAdapter.setTimeout(serviceId, timeout)
 	}
+
+	/**
+	 * Notify all the targets of the given escalation policy
+	 */
+	private _notify(ep: EscalationPolicy, message: string): void {
+		for (const target of ep) {
+			switch (target.type) {
+				case "SMS": {
+					this.smsAdapter.send(target.phoneNumber, message)
+					break
+				}
+				case "EMAIL": {
+					this.mailAdapter.send(target.emailAddress, message)
+					break
+				}
+			}
+		}
+	}
+
+	public setTimeoutExpired(serviceId: ServiceId): void {}
 }

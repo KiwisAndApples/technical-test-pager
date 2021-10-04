@@ -1,6 +1,6 @@
 import { ServiceId } from "../types"
 
-export type EscalationPolicy = SMSPolicy | EmailPolicy
+export type EscalationPolicy = Array<SMSPolicy | EmailPolicy>
 
 export type SMSPolicy = {
 	type: "SMS"
