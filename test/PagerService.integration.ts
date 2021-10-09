@@ -20,6 +20,11 @@ describe("PagerService", () => {
 	})
 
 	// First use case
+	// Given a Monitored Service in a Healthy State,
+	// when the Pager receives an Alert related to this Monitored Service,
+	// then the Monitored Service becomes Unhealthy,
+	// the Pager notifies all targets of the first level of the escalation policy,
+	// and sets a 15-minutes acknowledgement delay
 	test("Alert fired first time", () => {
 		const spyMailPort = jest.spyOn(mailPortMock, "send")
 		const spySmsPort = jest.spyOn(smsPortMock, "send")
@@ -35,6 +40,12 @@ describe("PagerService", () => {
 	})
 
 	// Second use case
+	// Given a Monitored Service in an Unhealthy State,
+	// the corresponding Alert is not Acknowledged
+	// and the last level has not been notified,
+	// when the Pager receives the Acknowledgement Timeout,
+	// then the Pager notifies all targets of the next level of the escalation policy
+	// and sets a 15-minutes acknowledgement delay.
 	describe("", () => {
 		beforeAll(() => {
 			// set service_2 has unhealty state
@@ -59,6 +70,11 @@ describe("PagerService", () => {
 	})
 
 	// Third use case
+	// Given a Monitored Service in an Unhealthy State
+	// when the Pager receives the Acknowledgement
+	// and later receives the Acknowledgement Timeout,
+	// then the Pager doesn't notify any Target
+	// and doesn't set an acknowledgement delay.
 	describe("Timeout on acknowledged alert", () => {
 		beforeAll(() => {
 			// set service_3 has unhealty state
@@ -83,6 +99,10 @@ describe("PagerService", () => {
 	})
 
 	// Fourth use case
+	// Given a Monitored Service in an Unhealthy State,
+	// when the Pager receives an Alert related to this Monitored Service,
+	// then the Pager doesn’t notify any Target
+	// and doesn’t set an acknowledgement delay
 	describe("Do not refire alert on unhealthy service", () => {
 		beforeAll(() => {
 			// set service_4 has unhealty state
