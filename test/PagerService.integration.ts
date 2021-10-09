@@ -2,12 +2,12 @@ import type { EPPort, MailPort, PersistencePort, SMSPort, TimerPort } from "../s
 import { PagerService } from "../src/PagerService"
 import { EPPortMock, MailPortMock, SMSPortMock, TimerPortMock, PersistencePortMock } from "./mocks"
 
-describe("PagerService", () => {
+describe("PagerService:Integration", () => {
 	var pagerService: PagerService
 
 	const ePPortMock: EPPort = new EPPortMock()
 	const timerPortMock: TimerPort = new TimerPortMock()
-	const persistencePortMock: PersistencePort = new PersistencePortMock()
+	const persistencePortMock: PersistencePortMock = new PersistencePortMock()
 	const mailPortMock: MailPort = new MailPortMock()
 	const smsPortMock: SMSPort = new SMSPortMock()
 
@@ -17,6 +17,7 @@ describe("PagerService", () => {
 
 	afterEach(() => {
 		jest.clearAllMocks()
+		persistencePortMock.reset()
 	})
 
 	// First use case

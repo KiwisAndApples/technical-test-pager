@@ -37,4 +37,9 @@ export class PersistencePortMock implements PersistencePort {
 		this._store[serviceId].healthState = healthState
 		return true
 	}
+
+	// custom mock methods
+	public reset(): void {
+		this._store = {}
+	}
 }

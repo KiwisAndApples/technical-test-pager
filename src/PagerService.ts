@@ -41,11 +41,13 @@ export class PagerService {
 			return // Incident has already ben acknowledged
 		}
 
-		if (incident.escalationLevel <= ep.length) {
+		if (incident.escalationLevel + 1 < ep.length) {
 			incident.escalationLevel++
 			this._notify(ep[incident.escalationLevel], incident.message)
 			this.persistencePort.updateIncidentEscalationLevel(serviceId, incident.escalationLevel)
 			this.timePort.setTimeout(serviceId, timeout)
+		} else {
+			return // ERROR: Last escalation level reached
 		}
 	}
 
@@ -70,6 +72,10 @@ export class PagerService {
 
 		if (!incident) {
 			return false // not incident found
+		}
+
+		if (incident.healthState) {
+			return false // service is already healthy
 		}
 		return this.persistencePort.updateIncidentHealthState(serviceId, true)
 	}
