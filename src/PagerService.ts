@@ -13,8 +13,11 @@ export class PagerService {
 	) {}
 
 	public fireAlert(serviceId: ServiceId, message: string): void {
+		const incident = this.persistencePort.getIncident(serviceId)
+		if (incident) {
+			return // Service is already in unhealthy state
+		}
 		const ep = this.epPort.getEscalationPolicy(serviceId)
-
 		this._notify(ep[0], message)
 		this.persistencePort.createIncident(serviceId, { message, escalationLevel: 0 })
 		this.timePort.setTimeout(serviceId, timeout)

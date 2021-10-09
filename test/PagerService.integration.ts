@@ -81,4 +81,25 @@ describe("PagerService", () => {
 			expect(spyPeristencePort).toHaveBeenCalledWith("service_3", true)
 		})
 	})
+
+	// Fourth use case
+	describe("Do not refire alert on unhealthy service", () => {
+		beforeAll(() => {
+			// set service_4 has unhealty state
+			pagerService.fireAlert("service_4", "Test")
+			jest.clearAllMocks()
+		})
+
+		test("", () => {
+			const spyMailPort = jest.spyOn(mailPortMock, "send")
+			const spySmsPort = jest.spyOn(smsPortMock, "send")
+			const spyTimerPort = jest.spyOn(timerPortMock, "setTimeout")
+
+			pagerService.fireAlert("service_4", "Test")
+
+			expect(spyMailPort).not.toBeCalled()
+			expect(spySmsPort).not.toBeCalled()
+			expect(spyTimerPort).not.toBeCalled()
+		})
+	})
 })
