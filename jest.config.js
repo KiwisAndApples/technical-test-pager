@@ -4,5 +4,5 @@ module.exports = {
 	transform: {
 		"^.+\\.(ts|tsx)$": "ts-jest"
 	},
-	collectCoverageFrom: ["**/src/**/*.ts", "!**/src/adapters/**/*.ts"]
+	collectCoverageFrom: ["**/src/**/*.ts", "!**/src/ports/**/*.ts"]
 }

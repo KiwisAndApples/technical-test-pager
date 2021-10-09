@@ -1,10 +1,10 @@
-import { Incident, PersistenceAdapter } from "../../src/adapters"
+import { Incident, PersistencePort } from "../../src/ports"
 import { ServiceId } from "../../src/types"
 
 type IncidentStore = {
 	[key: string]: Incident
 }
-export class PersistenceAdapterMock implements PersistenceAdapter {
+export class PersistencePortMock implements PersistencePort {
 	private _store: IncidentStore = {}
 
 	public createIncident(serviceId: ServiceId, incident: { message: string; escalationLevel: number }): Boolean {

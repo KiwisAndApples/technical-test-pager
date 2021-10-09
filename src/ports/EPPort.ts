@@ -12,6 +12,6 @@ export type EmailPolicy = {
 	emailAddress: string
 }
 
-export interface EPAdapter {
+export interface EPPort {
 	getEscalationPolicy(serviceId: ServiceId): EscalationPolicy[]
 }

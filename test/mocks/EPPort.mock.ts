@@ -1,7 +1,7 @@
-import { EPAdapter, EscalationPolicy } from "../../src/adapters"
+import { EPPort, EscalationPolicy } from "../../src/ports"
 import { ServiceId } from "../../src/types"
 
-export class EPAdapterMock implements EPAdapter {
+export class EPPortMock implements EPPort {
 	getEscalationPolicy(serviceId: ServiceId): EscalationPolicy[] {
 		return [
 			// first level

@@ -7,7 +7,7 @@ export type Incident = {
 	message: string
 }
 
-export interface PersistenceAdapter {
+export interface PersistencePort {
 	createIncident(serviceId: ServiceId, incident: { message: string; escalationLevel: number }): Boolean
 	getIncident(serviceId: ServiceId): Incident | undefined
 	updateIncidentAcknowledged(serviceId: ServiceId, acknowledged: boolean): void

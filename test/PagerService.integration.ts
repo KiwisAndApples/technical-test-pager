@@ -1,24 +1,18 @@
-import type { EPAdapter, MailAdapter, PersistenceAdapter, SMSAdapter, TimerAdapter } from "../src/adapters"
+import type { EPPort, MailPort, PersistencePort, SMSPort, TimerPort } from "../src/ports"
 import { PagerService } from "../src/PagerService"
-import { EPAdapterMock, MailAdapterMock, SMSAdapterMock, TimerAdapterMock, PersistenceAdapterMock } from "./mocks"
+import { EPPortMock, MailPortMock, SMSPortMock, TimerPortMock, PersistencePortMock } from "./mocks"
 
 describe("PagerService", () => {
 	var pagerService: PagerService
 
-	const ePAdapterMock: EPAdapter = new EPAdapterMock()
-	const timerAdapterMock: TimerAdapter = new TimerAdapterMock()
-	const persistenceAdapterMock: PersistenceAdapter = new PersistenceAdapterMock()
-	const mailAdapterMock: MailAdapter = new MailAdapterMock()
-	const smsAdapterMock: SMSAdapter = new SMSAdapterMock()
+	const ePPortMock: EPPort = new EPPortMock()
+	const timerPortMock: TimerPort = new TimerPortMock()
+	const persistencePortMock: PersistencePort = new PersistencePortMock()
+	const mailPortMock: MailPort = new MailPortMock()
+	const smsPortMock: SMSPort = new SMSPortMock()
 
 	beforeEach(() => {
-		pagerService = new PagerService(
-			ePAdapterMock,
-			timerAdapterMock,
-			persistenceAdapterMock,
-			mailAdapterMock,
-			smsAdapterMock
-		)
+		pagerService = new PagerService(ePPortMock, timerPortMock, persistencePortMock, mailPortMock, smsPortMock)
 	})
 
 	afterEach(() => {
@@ -27,17 +21,17 @@ describe("PagerService", () => {
 
 	// First use case
 	test("Alert fired first time", () => {
-		const spyMailAdapter = jest.spyOn(mailAdapterMock, "send")
-		const spySmsAdapter = jest.spyOn(smsAdapterMock, "send")
-		const spyTimerAdapter = jest.spyOn(timerAdapterMock, "setTimeout")
-		const spyPeristenceAdapter = jest.spyOn(persistenceAdapterMock, "createIncident")
+		const spyMailPort = jest.spyOn(mailPortMock, "send")
+		const spySmsPort = jest.spyOn(smsPortMock, "send")
+		const spyTimerPort = jest.spyOn(timerPortMock, "setTimeout")
+		const spyPeristencePort = jest.spyOn(persistencePortMock, "createIncident")
 
 		pagerService.fireAlert("service_1", "Test")
 
-		expect(spyMailAdapter).toHaveBeenCalledTimes(1)
-		expect(spySmsAdapter).not.toBeCalled()
-		expect(spyTimerAdapter).toBeCalledWith("service_1", 15 * 60) // 15min
-		expect(spyPeristenceAdapter).toBeCalledWith("service_1", { message: "Test", escalationLevel: 0 })
+		expect(spyMailPort).toHaveBeenCalledTimes(1)
+		expect(spySmsPort).not.toBeCalled()
+		expect(spyTimerPort).toBeCalledWith("service_1", 15 * 60) // 15min
+		expect(spyPeristencePort).toBeCalledWith("service_1", { message: "Test", escalationLevel: 0 })
 	})
 
 	// Second use case
@@ -49,18 +43,18 @@ describe("PagerService", () => {
 		})
 
 		test("Timeout on none-acknowledged alert and last level not reach", () => {
-			const spyMailAdapter = jest.spyOn(mailAdapterMock, "send")
-			const spySmsAdapter = jest.spyOn(smsAdapterMock, "send")
-			const spyTimerAdapter = jest.spyOn(timerAdapterMock, "setTimeout")
-			const spyPeristenceAdapter = jest.spyOn(persistenceAdapterMock, "updateIncidentEscalationLevel")
+			const spyMailPort = jest.spyOn(mailPortMock, "send")
+			const spySmsPort = jest.spyOn(smsPortMock, "send")
+			const spyTimerPort = jest.spyOn(timerPortMock, "setTimeout")
+			const spyPeristencePort = jest.spyOn(persistencePortMock, "updateIncidentEscalationLevel")
 
 			pagerService.setTimeoutExpired("service_2")
 
-			expect(spyMailAdapter).not.toBeCalled()
-			expect(spySmsAdapter).toHaveBeenCalledTimes(2)
-			expect(spySmsAdapter).toHaveBeenLastCalledWith("234567890", "Test")
-			expect(spyTimerAdapter).toBeCalledWith("service_2", 15 * 60) // 15min
-			expect(spyPeristenceAdapter).toHaveBeenCalledWith("service_2", 1)
+			expect(spyMailPort).not.toBeCalled()
+			expect(spySmsPort).toHaveBeenCalledTimes(2)
+			expect(spySmsPort).toHaveBeenLastCalledWith("234567890", "Test")
+			expect(spyTimerPort).toBeCalledWith("service_2", 15 * 60) // 15min
+			expect(spyPeristencePort).toHaveBeenCalledWith("service_2", 1)
 		})
 	})
 
@@ -73,18 +67,18 @@ describe("PagerService", () => {
 		})
 
 		test("", () => {
-			const spyMailAdapter = jest.spyOn(mailAdapterMock, "send")
-			const spySmsAdapter = jest.spyOn(smsAdapterMock, "send")
-			const spyTimerAdapter = jest.spyOn(timerAdapterMock, "setTimeout")
-			const spyPeristenceAdapter = jest.spyOn(persistenceAdapterMock, "updateIncidentAcknowledged")
+			const spyMailPort = jest.spyOn(mailPortMock, "send")
+			const spySmsPort = jest.spyOn(smsPortMock, "send")
+			const spyTimerPort = jest.spyOn(timerPortMock, "setTimeout")
+			const spyPeristencePort = jest.spyOn(persistencePortMock, "updateIncidentAcknowledged")
 
 			pagerService.acknowledgeAlert("service_3")
 			pagerService.setTimeoutExpired("service_3")
 
-			expect(spyMailAdapter).not.toBeCalled()
-			expect(spySmsAdapter).not.toBeCalled()
-			expect(spyTimerAdapter).not.toBeCalled()
-			expect(spyPeristenceAdapter).toHaveBeenCalledWith("service_3", true)
+			expect(spyMailPort).not.toBeCalled()
+			expect(spySmsPort).not.toBeCalled()
+			expect(spyTimerPort).not.toBeCalled()
+			expect(spyPeristencePort).toHaveBeenCalledWith("service_3", true)
 		})
 	})
 })
