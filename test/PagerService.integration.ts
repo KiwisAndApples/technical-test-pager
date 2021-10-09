@@ -133,7 +133,7 @@ describe("PagerService:Integration", () => {
 	// and doesn’t set an acknowledgement delay
 	describe("No notification on timeoutExpired and incident state is back to healthy", () => {
 		beforeAll(() => {
-			// set service_4 has unhealty state
+			// set service_5 has unhealty state
 			pagerService.fireAlert("service_5", "Test")
 			jest.clearAllMocks()
 		})
