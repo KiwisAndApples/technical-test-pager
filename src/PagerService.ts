@@ -21,8 +21,8 @@ export class PagerService {
 			return // Service is already in unhealthy state
 		}
 		const ep = this.epPort.getEscalationPolicy(serviceId)
+		if (!this.persistencePort.createIncident(serviceId, { message, escalationLevel: 0 })) return // ERROR: Could not create incident because already exists
 		this._notify(ep[0], message)
-		this.persistencePort.createIncident(serviceId, { message, escalationLevel: 0 })
 		this.timePort.setTimeout(serviceId, timeout)
 	}
 
@@ -43,8 +43,8 @@ export class PagerService {
 
 		if (incident.escalationLevel + 1 < ep.length) {
 			incident.escalationLevel++
+			if (!this.persistencePort.updateIncidentEscalationLevel(serviceId, incident.escalationLevel)) return // ERROR: Could not update escalation level because already updated
 			this._notify(ep[incident.escalationLevel], incident.message)
-			this.persistencePort.updateIncidentEscalationLevel(serviceId, incident.escalationLevel)
 			this.timePort.setTimeout(serviceId, timeout)
 		} else {
 			return // ERROR: Last escalation level reached
@@ -54,14 +54,14 @@ export class PagerService {
 	/**
 	 * Called by Aircall Engineer using tge pager web console (8)
 	 */
-	public acknowledgeAlert(serviceId: ServiceId): void {
+	public acknowledgeAlert(serviceId: ServiceId): boolean {
 		const incident = this.persistencePort.getIncident(serviceId)
 
 		if (!incident) {
-			return // Service is healthy
+			return false // Service is healthy
 		}
 
-		this.persistencePort.updateIncidentAcknowledged(serviceId, true)
+		return this.persistencePort.updateIncidentAcknowledged(serviceId, true)
 	}
 
 	/**

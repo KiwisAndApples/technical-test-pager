@@ -7,7 +7,7 @@ type IncidentStore = {
 export class PersistencePortMock implements PersistencePort {
 	private _store: IncidentStore = {}
 
-	public createIncident(serviceId: ServiceId, incident: { message: string; escalationLevel: number }): Boolean {
+	public createIncident(serviceId: ServiceId, incident: { message: string; escalationLevel: number }): boolean {
 		if (serviceId in this._store) {
 			return false
 		}
@@ -25,12 +25,14 @@ export class PersistencePortMock implements PersistencePort {
 		return this._store[serviceId] || undefined
 	}
 
-	public updateIncidentAcknowledged(serviceId: ServiceId, acknowledged: boolean): void {
+	public updateIncidentAcknowledged(serviceId: ServiceId, acknowledged: boolean): boolean {
 		this._store[serviceId].acknowledged = acknowledged
+		return true
 	}
 
-	public updateIncidentEscalationLevel(serviceId: ServiceId, escalationLevel: number): void {
+	public updateIncidentEscalationLevel(serviceId: ServiceId, escalationLevel: number): boolean {
 		this._store[serviceId].escalationLevel = escalationLevel
+		return true
 	}
 
 	public updateIncidentHealthState(serviceId: ServiceId, healthState: boolean): boolean {
