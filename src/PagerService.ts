@@ -12,6 +12,9 @@ export class PagerService {
 		private smsPort: SMSPort
 	) {}
 
+	/**
+	 * Called by Alerting Service (3)
+	 */
 	public fireAlert(serviceId: ServiceId, message: string): void {
 		const incident = this.persistencePort.getIncident(serviceId)
 		if (incident) {
@@ -23,6 +26,9 @@ export class PagerService {
 		this.timePort.setTimeout(serviceId, timeout)
 	}
 
+	/**
+	 * Called by Timer Service (9)
+	 */
 	public setTimeoutExpired(serviceId: ServiceId): void {
 		const incident = this.persistencePort.getIncident(serviceId)
 		const ep = this.epPort.getEscalationPolicy(serviceId)
@@ -43,6 +49,9 @@ export class PagerService {
 		}
 	}
 
+	/**
+	 * Called by Aircall Engineer using tge pager web console (8)
+	 */
 	public acknowledgeAlert(serviceId: ServiceId): void {
 		const incident = this.persistencePort.getIncident(serviceId)
 
