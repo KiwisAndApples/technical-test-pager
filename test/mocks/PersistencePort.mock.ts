@@ -14,6 +14,7 @@ export class PersistencePortMock implements PersistencePort {
 
 		this._store[serviceId] = {
 			...incident,
+			healthState: false,
 			acknowledged: false,
 			serviceId: serviceId
 		}
@@ -30,5 +31,10 @@ export class PersistencePortMock implements PersistencePort {
 
 	public updateIncidentEscalationLevel(serviceId: ServiceId, escalationLevel: number): void {
 		this._store[serviceId].escalationLevel = escalationLevel
+	}
+
+	public updateIncidentHealthState(serviceId: ServiceId, healthState: boolean): boolean {
+		this._store[serviceId].healthState = healthState
+		return true
 	}
 }

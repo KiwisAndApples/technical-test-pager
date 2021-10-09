@@ -102,4 +102,34 @@ describe("PagerService", () => {
 			expect(spyTimerPort).not.toBeCalled()
 		})
 	})
+
+	// Fifth use case
+	// Given a Monitored Service in an Unhealthy State,
+	// when the Pager receives a Healthy event related to this Monitored Service
+	// and later receives the Acknowledgement Timeout,
+	// then the Monitored Service becomes Healthy,
+	// the Pager doesn’t notify any Target
+	// and doesn’t set an acknowledgement delay
+	describe("No notification on timeoutExpired and incident state is back to healthy", () => {
+		beforeAll(() => {
+			// set service_4 has unhealty state
+			pagerService.fireAlert("service_5", "Test")
+			jest.clearAllMocks()
+		})
+
+		test("", () => {
+			const spyMailPort = jest.spyOn(mailPortMock, "send")
+			const spySmsPort = jest.spyOn(smsPortMock, "send")
+			const spyTimerPort = jest.spyOn(timerPortMock, "setTimeout")
+			const spyPeristencePort = jest.spyOn(persistencePortMock, "updateIncidentHealthState")
+
+			pagerService.stopAlert("service_5")
+			pagerService.setTimeoutExpired("service_3")
+
+			expect(spyMailPort).not.toBeCalled()
+			expect(spySmsPort).not.toBeCalled()
+			expect(spyTimerPort).not.toBeCalled()
+			expect(spyPeristencePort).toHaveBeenCalledWith("service_5", true)
+		})
+	})
 })

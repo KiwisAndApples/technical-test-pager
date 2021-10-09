@@ -1,6 +1,7 @@
 import { ServiceId } from "../types"
 
 export type Incident = {
+	healthState: boolean
 	serviceId: ServiceId
 	escalationLevel: number
 	acknowledged: boolean
@@ -12,4 +13,5 @@ export interface PersistencePort {
 	getIncident(serviceId: ServiceId): Incident | undefined
 	updateIncidentAcknowledged(serviceId: ServiceId, acknowledged: boolean): void
 	updateIncidentEscalationLevel(serviceId: ServiceId, escalationLevel: number): void
+	updateIncidentHealthState(serviceId: ServiceId, healthState: boolean): boolean
 }

@@ -54,6 +54,18 @@ export class PagerService {
 	}
 
 	/**
+	 * Called by Aircall Engineer using tge pager web console (2)
+	 */
+	public stopAlert(serviceId: ServiceId): boolean {
+		const incident = this.persistencePort.getIncident(serviceId)
+
+		if (!incident) {
+			return false // not incident found
+		}
+		return this.persistencePort.updateIncidentHealthState(serviceId, true)
+	}
+
+	/**
 	 * Notify all the targets of the given escalation policy
 	 */
 	private _notify(ep: EscalationPolicy, message: string): void {
